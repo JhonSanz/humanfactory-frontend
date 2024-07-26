@@ -3,6 +3,7 @@ import * as Yup from 'yup';
 const STEPS = [
   {
     label: 'Atom',
+    multiple: true,
     form: [
       {
         "alias": "Nombre",
@@ -29,10 +30,12 @@ const STEPS = [
   },
   {
     label: 'Cell',
+    multiple: true,
     form: []
   },
   {
     label: 'Tissue',
+    multiple: true,
     form: []
   },
 ];

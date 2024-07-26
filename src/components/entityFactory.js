@@ -1,6 +1,7 @@
 import { useRef, useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import DynamicForm from './dynamicForm';
+import Paper from '@mui/material/Paper';
 
 
 export default function EntityFactory({ activeStep }) {
@@ -9,7 +10,7 @@ export default function EntityFactory({ activeStep }) {
   const [activeForm, setActiveForm] = useState(null);
 
   useEffect(() => {
-    if(activeStep?.form.length === 0) {
+    if (activeStep?.form.length === 0) {
       setActiveForm(null);
       return;
     }
@@ -31,14 +32,22 @@ export default function EntityFactory({ activeStep }) {
   return (
     <Box>
       {
-        activeForm && <DynamicForm
-          ref={ref}
-          fields={activeForm}
-          submitFunction={handleSubmitForm}
-          setIsSubmitting={setIsSubmitting}
-        />
+        [...Array(2).keys()].map(item => <Paper variant="elevation">
+          <Box p={5} m={2}>
+            <h4>{activeStep.label} {item + 1}</h4>
+            {
+              activeForm && <DynamicForm
+                ref={ref}
+                fields={activeForm}
+                submitFunction={handleSubmitForm}
+                setIsSubmitting={setIsSubmitting}
+              />
+            }
+          </Box>
+        </Paper>
+        )
       }
-      <button onClick={() => triggerSubmit()}> test</button>
+      {activeStep.multiple && <button>+</button>}
     </Box>
   )
 }
