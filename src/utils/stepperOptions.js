@@ -11,6 +11,20 @@ const STEPS = [
         "default": "",
         "validators": Yup.string().required("required")
       },
+      {
+        "alias": "Forma",
+        "name": "shape",
+        "type": "string",
+        "default": "",
+        "validators": Yup.string().required("required")
+      },
+      {
+        "alias": "Size",
+        "name": "size",
+        "type": "number",
+        "default": "",
+        "validators": Yup.string().required("required")
+      },
     ]
   },
   {

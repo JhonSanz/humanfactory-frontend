@@ -17,7 +17,6 @@ import Switch from '@mui/material/Switch';
 // import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 // import { MobileDatePicker } from '@mui/x-date-pickers/MobileDatePicker';
 // import { StaticDateTimePicker } from '@mui/x-date-pickers/StaticDateTimePicker';
-// import PasswordPicker from './passwordPicker';
 // import Slider from '@mui/material/Slider';
 // import AsynchronousAutocomplete from './asynchronousAutocomplete';
 // import MaxHeightTextarea from './textArea';
@@ -31,7 +30,6 @@ const DatePicker = dynamic(() => import('@mui/x-date-pickers/DatePicker').then(m
 const DateTimePicker = dynamic(() => import('@mui/x-date-pickers/DateTimePicker').then(mod => mod.DateTimePicker), { ssr: false });
 const MobileDatePicker = dynamic(() => import('@mui/x-date-pickers/MobileDatePicker').then(mod => mod.MobileDatePicker), { ssr: false });
 const StaticDateTimePicker = dynamic(() => import('@mui/x-date-pickers/StaticDateTimePicker').then(mod => mod.StaticDateTimePicker), { ssr: false });
-const PasswordPicker = dynamic(() => import('./passwordPicker'), { ssr: false });
 const Slider = dynamic(() => import('@mui/material/Slider'), { ssr: false });
 const AsynchronousAutocomplete = dynamic(() => import('./asynchronousAutocomplete'), { ssr: false });
 const MaxHeightTextarea = dynamic(() => import('./textArea'), { ssr: false });
@@ -381,13 +379,6 @@ const DynamicForm = forwardRef(function DynamicForm({
                     />
                   </Box>
                 )
-              }
-
-              {
-                item.type === "passwordPicker" && <PasswordPicker
-                  key="passwordsPicker"
-                  formik={formik}
-                />
               }
               {
                 item.type === "textArea" && (

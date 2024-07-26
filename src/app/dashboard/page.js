@@ -8,23 +8,32 @@ import EntityFactory from "@/components/entityFactory";
 
 
 export default function Dashboard() {
-  const [activeStep, setActiveStep] = useState(STEPS[0]);
+  const [stepsForm, setStepsForm] = useState(undefined);
+  const [activeStep, setActiveStep] = useState(undefined);
+
+  useEffect(() => {
+    setStepsForm([...STEPS]);
+    setActiveStep(STEPS[0]);
+  }, []);
+
 
   useEffect(() => {
     console.log(activeStep)
-  }, [activeStep])
+  }, [activeStep]);
 
   return (
     <Grid container>
       <Grid item xs={2}>
-        <VerticalLinearStepper
-          activeStep={activeStep}
-          setActiveStep={setActiveStep}
-          steps={STEPS}
-        />
+        {
+          stepsForm && <VerticalLinearStepper
+            activeStep={activeStep}
+            setActiveStep={setActiveStep}
+            steps={stepsForm}
+          />
+        }
       </Grid>
       <Grid item xs={10}>
-        <EntityFactory activeStep={activeStep} />
+        {activeStep && <EntityFactory activeStep={activeStep} />}
       </Grid>
     </Grid>
   )
