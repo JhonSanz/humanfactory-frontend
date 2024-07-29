@@ -28,11 +28,6 @@ export default function Dashboard() {
     setActiveStep(newStep)
   }
 
-  useEffect(() => {
-    console.log("collectedData", collectedData)
-  }, [collectedData])
-
-
   return (
     <Grid container>
       <Grid item xs={2}>
@@ -45,7 +40,7 @@ export default function Dashboard() {
         }
       </Grid>
       <Grid item xs={10}>
-        {activeStep && <EntityFactory ref={ref} activeStep={activeStep} />}
+        {activeStep && <EntityFactory ref={ref} activeStep={activeStep} collectedData={collectedData} />}
       </Grid>
     </Grid>
   )
