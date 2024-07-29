@@ -178,7 +178,7 @@ const DynamicForm = forwardRef(function DynamicForm({
         return formik.values
       }
     };
-  }, []);
+  }, [formik.values]);
 
   const handleKeyDown = (event) => {
     if (event.key === 'Enter' && triggerSubmit) {
@@ -424,6 +424,7 @@ const DynamicForm = forwardRef(function DynamicForm({
                     error={formik.touched[item.name] && formik.errors[item.name] !== undefined}
                     helperText={formik.errors[item.name]}
                     onKeyDown={handleKeyDown}
+                    size='small'
                   />
                 )
               }

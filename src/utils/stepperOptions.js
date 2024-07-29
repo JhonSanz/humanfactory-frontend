@@ -31,10 +31,23 @@ const STEPS = [
   {
     label: 'Cell',
     multiple: true,
-    form: []
+    form: [
+      {
+        "alias": "Nombre",
+        "name": "name",
+        "type": "string",
+        "default": "",
+        "validators": Yup.string().required("required")
+      },
+    ]
   },
   {
     label: 'Tissue',
+    multiple: true,
+    form: []
+  },
+  {
+    label: 'Organ',
     multiple: true,
     form: []
   },
