@@ -4,7 +4,7 @@ import VerticalLinearStepper from "@/components/fullStepper"
 import Grid from '@mui/material/Grid';
 import STEPS from "@/utils/stepperOptions";
 import EntityFactory from "@/components/entityFactory";
-
+import fetchBackend from "@/utils/commonFetch";
 
 
 export default function Dashboard() {
@@ -28,6 +28,27 @@ export default function Dashboard() {
     setActiveStep(newStep)
   }
 
+  function transformObject(originalObj) {
+    const transformedObj = {
+      data: []
+    };
+    for (const key in originalObj) {
+      if (Object.prototype.hasOwnProperty.call(originalObj, key)) {
+        transformedObj.data.push({
+          name: key,
+          data: originalObj[key]
+        });
+      }
+    }
+    return transformedObj;
+  }
+
+  async function submitGraph() {
+    const newObj = transformObject(collectedData);
+    const data = await fetchBackend("/graph", "POST", newObj)
+    console.log(data)
+  }
+
   return (
     <Grid container>
       <Grid item xs={2}>
@@ -36,6 +57,7 @@ export default function Dashboard() {
             activeStep={activeStep}
             setActiveStep={handleChangeStep}
             steps={stepsForm}
+            submitGraph={submitGraph}
           />
         }
       </Grid>

@@ -10,7 +10,7 @@ import Paper from '@mui/material/Paper';
 import Typography from '@mui/material/Typography';
 
 
-export default function VerticalLinearStepper({ activeStep, setActiveStep, steps }) {
+export default function VerticalLinearStepper({ activeStep, setActiveStep, steps, submitGraph }) {
   return (
     <Box sx={{ maxWidth: 200, borderRight: "1px solid #d9d9d9" }}>
       <Stepper activeStep={activeStep === undefined ? steps.length : steps.findIndex(item => item.label === activeStep.label)} orientation="vertical">
@@ -44,12 +44,12 @@ export default function VerticalLinearStepper({ activeStep, setActiveStep, steps
         <Paper square elevation={0} sx={{ p: 3 }}>
           <Typography>Save?</Typography>
           <Button
-            onClick={() => setActiveStep(steps[steps.length - 1])}
+            onClick={() => setActiveStep(steps[steps.length - 2])}
             sx={{ mt: 1, mr: 1 }}
           >
             Back
           </Button>
-          <Button onClick={() => { }} variant="contained" color='success' sx={{ mt: 1, mr: 1 }}>
+          <Button onClick={() => submitGraph()} variant="contained" color='success' sx={{ mt: 1, mr: 1 }}>
             Save
           </Button>
         </Paper>
