@@ -19,6 +19,15 @@ export default function Dashboard() {
     setActiveStep(STEPS[0]);
   }, []);
 
+  useEffect(() => {
+    const initial = {};
+    for (let item of STEPS) {
+      initial[item.label] = [{}]
+    }
+    setCollectedData(initial);
+    console.log(initial)
+  }, []);
+
   function handleChangeStep(newStep) {
     if (!ref || !ref.current) return;
     if (!ref.current.getStepValues()) return;
@@ -63,7 +72,7 @@ export default function Dashboard() {
         }
       </Grid>
       <Grid item xs={10}>
-        {activeStep && <EntityFactory ref={ref} activeStep={activeStep} collectedData={collectedData} />}
+        {activeStep && <EntityFactory ref={ref} activeStep={activeStep} collectedData={collectedData} setCollectedData={setCollectedData} />}
       </Grid>
     </Grid>
   )

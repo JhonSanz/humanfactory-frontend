@@ -6,9 +6,8 @@ import Paper from '@mui/material/Paper';
 import GeneralForm from './generalForm';
 
 
-const EntityFactory = forwardRef(function EntityFactory({ activeStep, collectedData }, ref) {
+const EntityFactory = forwardRef(function EntityFactory({ activeStep, collectedData, setCollectedData }, ref) {
   const arrayRef = useRef([]);
-  const [numForms, setNumForms] = useState(1);
 
   function getAllFormValues() {
     return arrayRef.current.map(item => item.getGeneralFormValues())
@@ -22,10 +21,23 @@ const EntityFactory = forwardRef(function EntityFactory({ activeStep, collectedD
     };
   }, []);
 
+  function appendNewForm() {
+    const copied = { ...collectedData };
+    copied[activeStep.label].push({})
+    setCollectedData(copied)
+  }
+
+  useEffect(() => {
+    arrayRef.current = arrayRef.current.slice(0, collectedData[activeStep.label].length);
+  }, [collectedData]);
+
   return (
     <Box>
       {
-        [...Array(numForms).keys()].map((item, index) => <Paper variant="elevation" style={{ backgroundColor: "#fafafa" }}>
+        collectedData[activeStep.label] && collectedData[activeStep.label].map((item, index) => <Paper
+          variant="elevation"
+          style={{ backgroundColor: "#fafafa" }}
+        >
           <Box p={3} m={2}>
             <h4>{activeStep.label} {index + 1}</h4>
             <GeneralForm
@@ -35,12 +47,10 @@ const EntityFactory = forwardRef(function EntityFactory({ activeStep, collectedD
         </Paper>
         )
       }
-      {
-        activeStep?.multiple && <Box style={{ display: "flex" }}>
-          <button onClick={() => setNumForms(numForms + 1)}>+</button>
-          <button onClick={() => setNumForms(numForms - 1)}>-</button>
-        </Box>
-      }
+      <Box style={{ display: "flex" }}>
+        <button onClick={() => appendNewForm()}>+</button>
+        <button onClick={() => { }}>-</button>
+      </Box>
     </Box>
   )
 })

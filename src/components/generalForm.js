@@ -102,7 +102,8 @@ const GeneralForm = forwardRef(function GeneralForm({ }, ref) {
 
   function getAllFormValues() {
     const allValues = arrayRef.current.map(item => item.getFormValues());
-    return mergeArrayToObject(allValues)
+    // return mergeArrayToObject(allValues)
+    return allValues;
   }
 
   const arrayRef = useRef([]);
