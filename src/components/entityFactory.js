@@ -3,19 +3,15 @@ import { forwardRef, useImperativeHandle } from 'react';
 import Box from '@mui/material/Box';
 import DynamicForm from './dynamicForm';
 import Paper from '@mui/material/Paper';
-
+import GeneralForm from './generalForm';
 
 
 const EntityFactory = forwardRef(function EntityFactory({ activeStep, collectedData }, ref) {
   const arrayRef = useRef([]);
-  const [finalForm, setFinalForm] = useState([]);
-
-  useEffect(() => {
-    arrayRef.current = arrayRef.current.slice(0, finalForm.length);
-  }, [finalForm]);
+  const [numForms, setNumForms] = useState(1);
 
   function getAllFormValues() {
-    return arrayRef.current.map(item => item.getFormValues())
+    return arrayRef.current.map(item => item.getGeneralFormValues())
   }
 
   useImperativeHandle(ref, () => {
@@ -26,58 +22,23 @@ const EntityFactory = forwardRef(function EntityFactory({ activeStep, collectedD
     };
   }, []);
 
-  function buildForm() {
-    if (!collectedData[activeStep.label]) {
-      return [activeStep.form]
-    };
-    const result = collectedData[activeStep.label].map((item) => {
-      return activeStep.form.map(stepItem => {
-        return {
-          ...stepItem,
-          default: item[stepItem.name]
-        }
-      })
-    })
-    return result
-  }
-
-  function appendForm() {
-    const copyForm = [...finalForm];
-    copyForm.push(activeStep.form)
-    setFinalForm(copyForm);
-  }
-
-  function removeLastForm() {
-    const copyForm = [...finalForm];
-    copyForm.splice(-1, 1)
-    setFinalForm(copyForm);
-  }
-
-
-  useEffect(() => {
-    setFinalForm(buildForm())
-  }, [activeStep])
-
   return (
     <Box>
       {
-        finalForm.length > 0 && finalForm.map((item, index) => (
-          <Paper key={`val_${index}`} variant="elevation" >
-            <Box p={3} m={2}>
-              <h4>{activeStep.label} {index + 1}</h4>
-              <DynamicForm
-                ref={el => arrayRef.current[index] = el}
-                fields={item}
-                submitFunction={() => { }}
-              />
-            </Box>
-          </Paper>
-        ))
+        [...Array(numForms).keys()].map((item, index) => <Paper variant="elevation" style={{ backgroundColor: "#fafafa" }}>
+          <Box p={3} m={2}>
+            <h4>{activeStep.label} {index + 1}</h4>
+            <GeneralForm
+              ref={el => arrayRef.current[index] = el}
+            />
+          </Box>
+        </Paper>
+        )
       }
       {
         activeStep?.multiple && <Box style={{ display: "flex" }}>
-          <button onClick={() => appendForm()}>+</button>
-          <button onClick={() => removeLastForm()}>-</button>
+          <button onClick={() => setNumForms(numForms + 1)}>+</button>
+          <button onClick={() => setNumForms(numForms - 1)}>-</button>
         </Box>
       }
     </Box>

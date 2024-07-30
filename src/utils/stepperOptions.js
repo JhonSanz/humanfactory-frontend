@@ -35,7 +35,7 @@ const STEPS = [
       {
         "alias": "Nombre",
         "name": "name",
-        "type": "string",
+        "type": "generalForm",
         "default": "",
         "validators": Yup.string().required("required")
       },

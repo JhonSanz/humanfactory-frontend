@@ -26,6 +26,7 @@ export default function Dashboard() {
     stepForm[activeStep.label] = ref.current.getStepValues();
     setCollectedData({ ...collectedData, ...stepForm })
     setActiveStep(newStep)
+    console.log({ ...collectedData, ...stepForm })
   }
 
   function transformObject(originalObj) {
@@ -45,8 +46,8 @@ export default function Dashboard() {
 
   async function submitGraph() {
     const newObj = transformObject(collectedData);
-    const data = await fetchBackend("/graph", "POST", newObj)
-    console.log(data)
+    console.log(newObj)
+    // const data = await fetchBackend("/graph", "POST", newObj)
   }
 
   return (
