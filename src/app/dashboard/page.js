@@ -13,6 +13,9 @@ export default function Dashboard() {
   const [collectedData, setCollectedData] = useState({});
   const ref = useRef(null);
 
+  // useEffect(() => {
+  //   console.log("collectedData", collectedData)
+  // }, [collectedData]);
 
   useEffect(() => {
     setStepsForm([...STEPS]);
@@ -25,7 +28,6 @@ export default function Dashboard() {
       initial[item.label] = [{}]
     }
     setCollectedData(initial);
-    console.log(initial)
   }, []);
 
   function handleChangeStep(newStep) {
@@ -35,7 +37,6 @@ export default function Dashboard() {
     stepForm[activeStep.label] = ref.current.getStepValues();
     setCollectedData({ ...collectedData, ...stepForm })
     setActiveStep(newStep)
-    console.log({ ...collectedData, ...stepForm })
   }
 
   function transformObject(originalObj) {
@@ -63,7 +64,7 @@ export default function Dashboard() {
     <Grid container>
       <Grid item xs={2}>
         {
-          stepsForm && <VerticalLinearStepper
+          activeStep && stepsForm && <VerticalLinearStepper
             activeStep={activeStep}
             setActiveStep={handleChangeStep}
             steps={stepsForm}

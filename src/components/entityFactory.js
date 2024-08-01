@@ -27,6 +27,11 @@ const EntityFactory = forwardRef(function EntityFactory({ activeStep, collectedD
     setCollectedData(copied)
   }
 
+  // useEffect(() => {
+  //   debugger;
+  // }, [activeStep]);
+
+
   useEffect(() => {
     arrayRef.current = arrayRef.current.slice(0, collectedData[activeStep.label].length);
   }, [collectedData]);
@@ -37,11 +42,14 @@ const EntityFactory = forwardRef(function EntityFactory({ activeStep, collectedD
         collectedData[activeStep.label] && collectedData[activeStep.label].map((item, index) => <Paper
           variant="elevation"
           style={{ backgroundColor: "#fafafa" }}
+          key={item}
         >
-          <Box p={3} m={2}>
+          <Box p={3} m={2} >
             <h4>{activeStep.label} {index + 1}</h4>
             <GeneralForm
               ref={el => arrayRef.current[index] = el}
+              currentForm={item}
+              activeStep={activeStep}
             />
           </Box>
         </Paper>
