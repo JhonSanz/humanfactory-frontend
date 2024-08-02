@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from 'react';
+import { forwardRef, useImperativeHandle, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import Box from '@mui/material/Box';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
@@ -8,17 +9,13 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Asynchronous from '@/components/prototype/autocomplete';
-import { TextareaAutosize } from '@mui/base/TextareaAutosize';
 
 
 function ParamsPicker({
   size = "medium",
-  initialLabel
+  paramsForm,
+  setParamsForm,
 }) {
-  const [paramsForm, setParamsForm] = useState([
-    { name: initialLabel, value: "" }
-  ]);
-
   function addNewProp() {
     setParamsForm([...paramsForm, { name: "param", value: "" }])
   }
@@ -29,13 +26,41 @@ function ParamsPicker({
     setParamsForm(copied)
   }
 
+  function modifyItem(index, field, value) {
+    const copiedData = [...paramsForm];
+    const copiedDataItem = copiedData[index];
+    copiedDataItem[field] = value;
+    copiedData.splice(index, 1, copiedDataItem);
+    setParamsForm(copiedData);
+  }
+
+  useEffect(() => {
+    console.log("paramsForm", paramsForm)
+  }, [])
+
   return (
-    <Box style={{ padding: "10px", border: "1px dotted gray" }}>
+    <Box style={{ padding: "20px", border: "1px dotted gray" }}>
       {
-        paramsForm.map(item => (
-          <Box style={{ display: "flex" }}>
-            <TextField size={size} fullWidth id="outlined-basic" label={item.name} variant="outlined" />
-            <TextField size={size} fullWidth id="outlined-basic" label="Valor" variant="outlined" />
+        paramsForm.map((item, index) => (
+          <Box style={{ display: "flex", marginBottom: "15px" }}>
+            <TextField
+              size={size}
+              fullWidth
+              id="outlined-basic"
+              label="Parametro"
+              variant="outlined"
+              value={item.name}
+              onChange={(e) => modifyItem(index, "name", e.target.value)}
+            />
+            <TextField
+              size={size}
+              fullWidth
+              id="outlined-basic"
+              label="Valor"
+              variant="outlined"
+              value={item.value}
+              onChange={(e) => modifyItem(index, "value", e.target.value)}
+            />
           </Box>
         ))
       }
@@ -45,28 +70,42 @@ function ParamsPicker({
   )
 }
 
+const Mercar = forwardRef(function Mercar({ }, ref) {
+  const [purchase, setPurchase] = useState([
+    {
+      params: [{ name: "initialLabel", value: "" }]
+    }
+  ]);
 
+  useImperativeHandle(ref, () => {
+    return {
+      getPurchases() {
+        return purchase;
+      }
+    };
+  }, [purchase]);
 
-function Mercar() {
-  const DEFAULT_TEXTAREA = `
-  {
-    "relation_name": "",
-    "param1": "",
-    "param2": "",
+  function updatePurchase(newValue, index) {
+    const copiedData = [...purchase];
+    const copiedItem = { ...copiedData[index] };
+    copiedItem.params = newValue;
+    copiedData.splice(index, 1, copiedItem);
+    setPurchase(copiedData)
   }
-  `
 
-
-  const [purchase, setPurchase] = useState([1]);
-  const [textArea, setTextArea] = useState(DEFAULT_TEXTAREA);
+  function addRelation() {
+    setPurchase([...purchase, {
+      params: [{ name: "initialLabel", value: "" }]
+    }])
+  }
 
   return (
     <Box>
       <Box sx={{ padding: "25px", backgroundColor: "#fafafa" }}>
         {
-          purchase.map(item => (
+          purchase.map((item, index) => (
             <Box>
-              <Box display="flex">
+              <Box display="flex" mb={3}>
                 <Box style={{ padding: 10, width: "100%" }}>
                   <Asynchronous label="Codigo/Nombre" />
                   <Box>
@@ -77,7 +116,12 @@ function Mercar() {
                 </Box>
                 <Box style={{ padding: 10, width: "100%" }}>
                   <h4>Parametros de la relación</h4>
-                  <ParamsPicker size="small" initialLabel="Relation" />
+                  <ParamsPicker
+                    size="small"
+                    initialLabel="Relation"
+                    paramsForm={item.params}
+                    setParamsForm={(updatedValue) => updatePurchase(updatedValue, index)}
+                  />
                 </Box>
               </Box>
               <hr />
@@ -85,17 +129,28 @@ function Mercar() {
           ))
         }
       </Box>
-      <button onClick={() => { }}>Vincular</button>
+      <button onClick={() => addRelation()}>Vincular</button>
     </Box>
   )
-}
+})
 
 
 export default function Prototype() {
+  const mercarRef = useRef(null);
   const [itemType, setItemType] = useState("fundamental");
+
   const handleChange = (event) => {
     setItemType(event.target.value);
   };
+
+  const [paramsForm, setParamsForm] = useState([
+    { name: "initialLabel", value: "" }
+  ]);
+
+  function handleSubmitFullForm() {
+    console.log(mercarRef.current.getPurchases())
+  }
+
   return (
     <Box
       sx={{ padding: "50px", border: "1px dotted black", borderRadius: "5px" }}
@@ -106,7 +161,11 @@ export default function Prototype() {
       </Box>
       <Box mb={2}>
         <h4>Parametros del objeto</h4>
-        <ParamsPicker initialLabel="Param" />
+        <ParamsPicker
+          initialLabel="Param"
+          paramsForm={paramsForm}
+          setParamsForm={setParamsForm}
+        />
       </Box>
       <Box mb={2}>
         <Asynchronous label="tipo" />
@@ -134,8 +193,11 @@ export default function Prototype() {
         </Select>
       </FormControl>
       {
-        itemType === "shopping" && <Mercar />
+        itemType === "shopping" && <Mercar ref={mercarRef} />
       }
+      <Box pt={5}>
+        <button onClick={() => handleSubmitFullForm()}>GUARDAR</button>
+      </Box>
     </Box>
   )
 }
