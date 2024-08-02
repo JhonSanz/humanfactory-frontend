@@ -9,6 +9,7 @@ import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Asynchronous from '@/components/prototype/autocomplete';
+import fetchBackend from "@/utils/commonFetch";
 
 
 function ParamsPicker({
@@ -73,6 +74,7 @@ function ParamsPicker({
 const Mercar = forwardRef(function Mercar({ }, ref) {
   const [purchase, setPurchase] = useState([
     {
+      related: "SOME_CODE",
       params: [{ name: "initialLabel", value: "" }]
     }
   ]);
@@ -94,9 +96,12 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
   }
 
   function addRelation() {
-    setPurchase([...purchase, {
-      params: [{ name: "initialLabel", value: "" }]
-    }])
+    setPurchase([
+      ...purchase, {
+        related: "SOME_CODE",
+        params: [{ name: "initialLabel", value: "" }]
+      }
+    ])
   }
 
   return (
@@ -138,17 +143,42 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
 export default function Prototype() {
   const mercarRef = useRef(null);
   const [itemType, setItemType] = useState("fundamental");
+  const [formInsumo, setFormInsumo] = useState({
+    name: "",
+    code: "",
+    type: "",
+  });
 
   const handleChange = (event) => {
     setItemType(event.target.value);
   };
+
+  function handleChangeInsumoForm(e) {
+    const copiedFormInsumo = { ...formInsumo };
+    copiedFormInsumo[e.target.name] = e.target.value;
+    setFormInsumo(copiedFormInsumo);
+  }
 
   const [paramsForm, setParamsForm] = useState([
     { name: "initialLabel", value: "" }
   ]);
 
   function handleSubmitFullForm() {
-    console.log(mercarRef.current.getPurchases())
+    const finalBody = {
+      ...formInsumo,
+      nodeParams: paramsForm,
+      nodeRelations: []
+    }
+    switch (itemType) {
+      case "shopping":
+        finalBody["nodeRelations"] = mercarRef.current.getPurchases();
+        break;
+      default:
+        break;
+    }
+
+    console.log(finalBody)
+    fetchBackend("/graph/insumo/", "POST", finalBody)
   }
 
   return (
@@ -157,7 +187,15 @@ export default function Prototype() {
     >
       <h2>CREACION DE INSUMOS</h2>
       <Box mb={2}>
-        <TextField fullWidth id="outlined-basic" label="Nombre" variant="outlined" />
+        <TextField
+          fullWidth
+          id="outlined-basic"
+          label="Nombre"
+          name="name"
+          variant="outlined"
+          value={formInsumo["name"]}
+          onChange={handleChangeInsumoForm}
+        />
       </Box>
       <Box mb={2}>
         <h4>Parametros del objeto</h4>
@@ -168,10 +206,27 @@ export default function Prototype() {
         />
       </Box>
       <Box mb={2}>
-        <Asynchronous label="tipo" />
+        {/* <Asynchronous label="tipo" /> */}
+        <TextField
+          fullWidth
+          id="outlined-basic"
+          label="Tipo"
+          name="type"
+          variant="outlined"
+          value={formInsumo["type"]}
+          onChange={handleChangeInsumoForm}
+        />
       </Box>
       <Box mb={2}>
-        <TextField fullWidth id="outlined-basic" label="Codigo" variant="outlined" />
+        <TextField
+          fullWidth
+          id="outlined-basic"
+          label="Codigo"
+          name="code"
+          variant="outlined"
+          value={formInsumo["code"]}
+          onChange={handleChangeInsumoForm}
+        />
       </Box>
       <FormControl fullWidth>
         <InputLabel id="demo-simple-select-label">Tipo</InputLabel>
