@@ -10,7 +10,7 @@ import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
 import Asynchronous from '@/components/prototype/autocomplete';
 import fetchBackend from "@/utils/commonFetch";
-
+import AsyncAutocomplete from '@/components/prototype/asyncAutocomplete';
 
 function ParamsPicker({
   size = "medium",
@@ -75,9 +75,10 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
   const [purchase, setPurchase] = useState([
     {
       related: "SOME_CODE",
-      params: [{ name: "initialLabel", value: "" }]
+      params: [{ name: "", value: "" }]
     }
   ]);
+  const [value, setValue] = useState({})
 
   useImperativeHandle(ref, () => {
     return {
@@ -99,7 +100,7 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
     setPurchase([
       ...purchase, {
         related: "SOME_CODE",
-        params: [{ name: "initialLabel", value: "" }]
+        params: [{ name: "", value: "" }]
       }
     ])
   }
@@ -112,7 +113,10 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
             <Box>
               <Box display="flex" mb={3}>
                 <Box style={{ padding: 10, width: "100%" }}>
-                  <Asynchronous label="Codigo/Nombre" />
+                  <AsyncAutocomplete
+                    value={value}
+                    setValue={setValue}
+                  />
                   <Box>
                     <h5>Elemento universal</h5>
                     <p>codigo: CUYF221</p>
@@ -142,6 +146,7 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
 
 export default function Prototype() {
   const mercarRef = useRef(null);
+  const [disabledButton, setDisabledButton] = useState(false);
   const [itemType, setItemType] = useState("fundamental");
   const [formInsumo, setFormInsumo] = useState({
     name: "",
@@ -160,10 +165,11 @@ export default function Prototype() {
   }
 
   const [paramsForm, setParamsForm] = useState([
-    { name: "initialLabel", value: "" }
+    { name: "", value: "" }
   ]);
 
-  function handleSubmitFullForm() {
+  async function handleSubmitFullForm() {
+    setDisabledButton(true);
     const finalBody = {
       ...formInsumo,
       nodeParams: paramsForm,
@@ -177,8 +183,14 @@ export default function Prototype() {
         break;
     }
 
-    console.log(finalBody)
-    fetchBackend("/graph/insumo/", "POST", finalBody)
+    const result = await fetchBackend("/graph/insumo/", "POST", finalBody)
+    if (result.ok === false) {
+      alert(result.data);
+      setDisabledButton(false);
+      return;
+    }
+    setDisabledButton(false);
+    window.location.reload()
   }
 
   return (
@@ -251,7 +263,7 @@ export default function Prototype() {
         itemType === "shopping" && <Mercar ref={mercarRef} />
       }
       <Box pt={5}>
-        <button onClick={() => handleSubmitFullForm()}>GUARDAR</button>
+        <button disabled={disabledButton} onClick={() => handleSubmitFullForm()}>GUARDAR</button>
       </Box>
     </Box>
   )

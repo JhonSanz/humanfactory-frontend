@@ -38,12 +38,11 @@ async function fetchBackend(
 
   try {
     const response = await fetch(getFinalURL(), getFinalOptions());
+    const responseData = await response.json();
 
     if (!response.ok) {
-      throw new Error('Error en la solicitud: ' + response.statusText);
+      return { ok: false, data: responseData.detail }
     }
-
-    const responseData = await response.json();
     console.log('Datos recibidos:', responseData);
 
     return responseData;
