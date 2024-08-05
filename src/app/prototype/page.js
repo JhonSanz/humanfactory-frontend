@@ -74,11 +74,14 @@ function ParamsPicker({
 const Mercar = forwardRef(function Mercar({ }, ref) {
   const [purchase, setPurchase] = useState([
     {
-      related: "SOME_CODE",
+      related: {},
       params: [{ name: "", value: "" }]
     }
   ]);
-  const [value, setValue] = useState({})
+
+  useEffect(() => {
+    console.log(purchase)
+  }, [purchase])
 
   useImperativeHandle(ref, () => {
     return {
@@ -87,6 +90,14 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
       }
     };
   }, [purchase]);
+
+  function handleChangeAutocomplete(newValue, index) {
+    const copiedData = [...purchase];
+    const copiedItem = { ...copiedData[index] };
+    copiedItem.related = newValue;
+    copiedData.splice(index, 1, copiedItem);
+    setPurchase(copiedData)
+  }
 
   function updatePurchase(newValue, index) {
     const copiedData = [...purchase];
@@ -99,10 +110,16 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
   function addRelation() {
     setPurchase([
       ...purchase, {
-        related: "SOME_CODE",
+        related: {},
         params: [{ name: "", value: "" }]
       }
     ])
+  }
+
+  function removeRelation() {
+    const copied = [...purchase];
+    copied.splice(-1, 1)
+    setPurchase(copied)
   }
 
   return (
@@ -114,13 +131,15 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
               <Box display="flex" mb={3}>
                 <Box style={{ padding: 10, width: "100%" }}>
                   <AsyncAutocomplete
-                    value={value}
-                    setValue={setValue}
+                    value={item.related}
+                    setValue={(newValue) => handleChangeAutocomplete(newValue, index)}
                   />
                   <Box>
-                    <h5>Elemento universal</h5>
-                    <p>codigo: CUYF221</p>
-                    <p>Propiedades</p>
+                    {item?.related && item?.related?.properties && Object.entries(item?.related.properties).map(([key, value]) => (
+                      <div key={key}>
+                        <strong>{key}</strong>: <span>{value}</span>
+                      </div>
+                    ))}
                   </Box>
                 </Box>
                 <Box style={{ padding: 10, width: "100%" }}>
@@ -138,7 +157,10 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
           ))
         }
       </Box>
-      <button onClick={() => addRelation()}>Vincular</button>
+      <Box display="flex">
+        <button onClick={() => addRelation()}>Vincular</button>
+        {purchase.length > 1 && <button onClick={() => removeRelation()}>Quitar</button>}
+      </Box>
     </Box>
   )
 })
@@ -177,7 +199,16 @@ export default function Prototype() {
     }
     switch (itemType) {
       case "shopping":
-        finalBody["nodeRelations"] = mercarRef.current.getPurchases();
+        let dataPurchases = mercarRef.current.getPurchases();
+        dataPurchases = dataPurchases.map((item) => {
+          if (item.related.properties.code) {
+            return {
+              related: item.related.properties.code,
+              params: item.params
+            }
+          }
+        })
+        finalBody["nodeRelations"] = dataPurchases;
         break;
       default:
         break;
