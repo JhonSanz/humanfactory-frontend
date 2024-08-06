@@ -36,7 +36,7 @@ function ShowItems() {
 
 
 // Componente para renderizar un nodo del árbol
-const TreeNode = ({ node, onToggle }) => {
+const TreeNode = ({ node, onToggle, theIndex }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -46,7 +46,9 @@ const TreeNode = ({ node, onToggle }) => {
       const fetchChildren = async () => {
         setLoading(true);
         try {
-          const response = [{ properties: { code: "test", name: "Aqui estoy" } }]
+          // const response = [{ properties: { code: "test", name: "Aqui estoy" } }]
+          const response = await fetchBackend("/graph/node-children", "GET", {}, { node_code: node.properties.code });
+
           setChildren(response);
         } catch (error) {
           console.error('Error fetching children:', error);
@@ -65,20 +67,23 @@ const TreeNode = ({ node, onToggle }) => {
   };
 
   return (
-    <div style={{ marginLeft: '20px' }}>
-      <div onClick={handleToggle} style={{ cursor: 'pointer' }}>
-        {node.properties.name} {node.properties.code} {children.length > 0 && (isExpanded ? '[-]' : '[+]')}
+    <div style={{ marginLeft: '20px', padding: "5px" }}>
+      <div style={{ display: "flex", justifyContent: "start" }}>
+        <div style={{ marginRight: "10px" }}>{theIndex}</div>
+        <div><small>{node.properties.code}</small> {node.properties.name}</div>
+        <div onClick={handleToggle} style={{ cursor: 'pointer',  marginLeft: "10px" }}>{isExpanded ? '[-]' : '[+]'}</div>
       </div>
       {isExpanded && (
         <div>
           {loading ? <p>Cargando...</p> : (
             <div>
-              {children.map(child => (
+              {children.map((child, index) => (
                 <TreeNode
                   key={child.id}
                   node={child}
                   onToggle={onToggle}
                   // expandedNodes={expandedNodes}
+                  theIndex={`${theIndex}.${index + 1}`}
                 />
               ))}
             </div>
@@ -123,12 +128,13 @@ const TreeView = () => {
     <div>
       <h1>Árbol de Datos</h1>
       <div>
-        {rootNodes.map(node => (
+        {rootNodes.map((node, index) => (
           <TreeNode
             key={node.properties.code}
             node={node}
             onToggle={handleToggle}
             expandedNodes={expandedNodes}
+            theIndex={index + 1}
           />
         ))}
       </div>
