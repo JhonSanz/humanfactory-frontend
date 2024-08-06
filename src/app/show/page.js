@@ -3,9 +3,9 @@
 import { useEffect, useState } from 'react';
 import Box from '@mui/material/Box';
 import fetchBackend from "@/utils/commonFetch";
+import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 
 
-// export default function ShowItems() {
 function ShowItems() {
   const [nodes, setNodes] = useState([]);
 
@@ -71,7 +71,10 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
       <div style={{ display: "flex", justifyContent: "start" }}>
         <div style={{ marginRight: "10px" }}>{theIndex}</div>
         <div><small>{node.properties.code}</small> {node.properties.name}</div>
-        <div onClick={handleToggle} style={{ cursor: 'pointer',  marginLeft: "10px" }}>{isExpanded ? '[-]' : '[+]'}</div>
+        <div style={{ cursor: 'pointer', marginLeft: "10px", display: "flex" }}>
+          <div><InfoOutlinedIcon fontSize='small' color='primary' vari /></div>
+          <div onClick={handleToggle}>{isExpanded ? '[-]' : '[+]'}</div>
+        </div>
       </div>
       {isExpanded && (
         <div>

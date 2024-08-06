@@ -8,10 +8,9 @@ import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
 import Select from '@mui/material/Select';
 import TextField from '@mui/material/TextField';
-import Asynchronous from '@/components/prototype/autocomplete';
 import fetchBackend from "@/utils/commonFetch";
 import AsyncAutocomplete from '@/components/prototype/asyncAutocomplete';
-import ToolbarApp from '@/components/toolbarApp';
+import Button from '@mui/material/Button';
 
 
 function ParamsPicker({
@@ -67,8 +66,8 @@ function ParamsPicker({
           </Box>
         ))
       }
-      <button onClick={() => addNewProp()}>Agregar</button>
-      {paramsForm.length > 1 && <button onClick={() => removeNewProp()}>Quitar</button>}
+      <Button color="secondary" size='small' variant="contained" onClick={() => addNewProp()}>Agregar</Button>
+      {paramsForm.length > 1 && <Button color="secondary" size='small' variant="contained" onClick={() => removeNewProp()}>Quitar</Button>}
     </Box>
   )
 }
@@ -160,8 +159,8 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
         }
       </Box>
       <Box display="flex">
-        <button onClick={() => addRelation()}>Vincular</button>
-        {purchase.length > 1 && <button onClick={() => removeRelation()}>Quitar</button>}
+        <Button color="secondary" size='small' variant="contained" onClick={() => addRelation()}>Vincular</Button>
+        {purchase.length > 1 && <Button color="secondary" size='small' variant="contained" onClick={() => removeRelation()}>Quitar</Button>}
       </Box>
     </Box>
   )
@@ -296,7 +295,7 @@ export default function Prototype() {
         itemType === "shopping" && <Mercar ref={mercarRef} />
       }
       <Box pt={5}>
-        <button disabled={disabledButton} onClick={() => handleSubmitFullForm()}>GUARDAR</button>
+        <Button color="primary" variant="contained" disabled={disabledButton} onClick={() => handleSubmitFullForm()}>GUARDAR</Button>
       </Box>
     </Box>
   )
