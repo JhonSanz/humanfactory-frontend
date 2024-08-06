@@ -1,9 +1,10 @@
 "use client"
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useContext } from 'react';
 import Box from '@mui/material/Box';
 import fetchBackend from "@/utils/commonFetch";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
+import { ThemeContext } from '@/components/providers';
 
 
 function ShowItems() {
@@ -40,6 +41,7 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(false);
+  const { setAlertContent } = useContext(ThemeContext);
 
   useEffect(() => {
     if (isExpanded) {
@@ -66,13 +68,37 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
     onToggle(node.properties.code);
   };
 
+  function showNodeDetails(data) {
+    // Si no hay datos, mostramos un mensaje en vez de la tabla
+    if (!data || typeof data !== 'object') {
+      return <p>No data available</p>;
+    }
+
+    // Obtener las claves del objeto para los encabezados
+    const entries = Object.entries(data);
+
+    return (
+      <div>
+        <h4>Detailed node</h4>
+        <div style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
+          {entries.map(([key, value]) => (
+            <div key={key} style={{ display: 'flex', marginBottom: '8px' }}>
+              <div style={{ flex: 1, fontWeight: 'bold' }}>{key.charAt(0).toUpperCase() + key.slice(1)}:</div>
+              <div style={{ flex: 2 }}>{value}</div>
+            </div>
+          ))}
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div style={{ marginLeft: '20px', padding: "5px" }}>
+    <div style={{ marginLeft: '30px', padding: "10px", width: "400px" }}>
       <div style={{ display: "flex", justifyContent: "start" }}>
         <div style={{ marginRight: "10px" }}>{theIndex}</div>
         <div><small>{node.properties.code}</small> {node.properties.name}</div>
         <div style={{ cursor: 'pointer', marginLeft: "10px", display: "flex" }}>
-          <div><InfoOutlinedIcon fontSize='small' color='primary' vari /></div>
+          <div><InfoOutlinedIcon onClick={() => setAlertContent(showNodeDetails(node.properties))} fontSize='small' color='primary' /></div>
           <div onClick={handleToggle}>{isExpanded ? '[-]' : '[+]'}</div>
         </div>
       </div>
@@ -130,17 +156,15 @@ const TreeView = () => {
   return (
     <div>
       <h1>Árbol de Datos</h1>
-      <div>
-        {rootNodes.map((node, index) => (
-          <TreeNode
-            key={node.properties.code}
-            node={node}
-            onToggle={handleToggle}
-            expandedNodes={expandedNodes}
-            theIndex={index + 1}
-          />
-        ))}
-      </div>
+      {rootNodes.map((node, index) => (
+        <TreeNode
+          key={node.properties.code}
+          node={node}
+          onToggle={handleToggle}
+          expandedNodes={expandedNodes}
+          theIndex={index + 1}
+        />
+      ))}
     </div>
   );
 };
