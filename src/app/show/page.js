@@ -1,11 +1,11 @@
 "use client"
 
-import { useEffect, useState, useContext } from 'react';
+import { useEffect, useState, useContext, useRef } from 'react';
 import Box from '@mui/material/Box';
 import fetchBackend from "@/utils/commonFetch";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { ThemeContext } from '@/components/providers';
-
+import { Mercar } from '../prototype/page';
 
 function ShowItems() {
   const [nodes, setNodes] = useState([]);
@@ -42,6 +42,7 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
   const [children, setChildren] = useState([]);
   const [loading, setLoading] = useState(false);
   const { setAlertContent } = useContext(ThemeContext);
+  const mercarRef = useRef(null);
 
   useEffect(() => {
     if (isExpanded) {
@@ -88,6 +89,7 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
             </div>
           ))}
         </div>
+        <Mercar ref={mercarRef} />
       </div>
     );
   }
@@ -95,7 +97,7 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
   return (
     <div style={{ marginLeft: '30px', padding: "10px", width: "400px" }}>
       <div style={{ display: "flex", justifyContent: "start" }}>
-        <div style={{ marginRight: "10px" }}>{theIndex}</div>
+        <div style={{ marginRight: "10px" }}><b>{theIndex}</b></div>
         <div><small>{node.properties.code}</small> {node.properties.name}</div>
         <div style={{ cursor: 'pointer', marginLeft: "10px", display: "flex" }}>
           <div><InfoOutlinedIcon onClick={() => setAlertContent(showNodeDetails(node.properties))} fontSize='small' color='primary' /></div>
@@ -112,7 +114,7 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
                   node={child}
                   onToggle={onToggle}
                   // expandedNodes={expandedNodes}
-                  theIndex={`${theIndex}.${index + 1}`}
+                  theIndex={`${theIndex}${index + 1}.`}
                 />
               ))}
             </div>
@@ -162,7 +164,7 @@ const TreeView = () => {
           node={node}
           onToggle={handleToggle}
           expandedNodes={expandedNodes}
-          theIndex={index + 1}
+          theIndex={`${index + 1}.`}
         />
       ))}
     </div>

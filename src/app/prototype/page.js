@@ -165,7 +165,7 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
     </Box>
   )
 })
-
+export { Mercar };
 
 export default function Prototype() {
   const mercarRef = useRef(null);
@@ -195,7 +195,7 @@ export default function Prototype() {
     setDisabledButton(true);
     const finalBody = {
       ...formInsumo,
-      nodeParams: paramsForm,
+      nodeParams: [...paramsForm, { name: "itemType", value: itemType }],
       nodeRelations: []
     }
     switch (itemType) {
