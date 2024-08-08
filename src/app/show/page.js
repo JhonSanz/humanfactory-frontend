@@ -101,6 +101,7 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
   const [children, setChildren] = useState([]);
   const [incomingEdges, setIncomingEdges] = useState([]);
   const [loading, setLoading] = useState(false);
+  const [modalReady, setModalReady] = useState(false);
   const { setAlertContent } = useContext(ThemeContext);
 
   useEffect(() => {
@@ -129,21 +130,25 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
   };
 
   async function getNodeDetail() {
+    setModalReady(false)
     try {
       const response = await fetchBackend("/graph/node-incoming-edges", "GET", {}, { node_code: node.properties.code });
       setIncomingEdges(response);
     } catch (error) {
       console.error('Error fetching children:', error);
     }
+    setModalReady(true)
   }
 
   useEffect(() => {
-    setAlertContent(<ShowNodeDetails
-      data={node.properties}
-      incomingEdges={incomingEdges}
-      setIncomingEdges={setIncomingEdges}
-    />)
-  }, [incomingEdges])
+    if (modalReady) {
+      setAlertContent(<ShowNodeDetails
+        data={node.properties}
+        incomingEdges={incomingEdges}
+        setIncomingEdges={setIncomingEdges}
+      />)
+    }
+  }, [incomingEdges, modalReady])
 
   return (
     <div style={{ marginLeft: '30px', padding: "10px", width: "400px" }}>
