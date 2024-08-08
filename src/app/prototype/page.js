@@ -278,10 +278,10 @@ export default function Prototype() {
           onChange={handleChange}
         >
           <MenuItem value={"fundamental"}>Elemento fundamental</MenuItem>
+          <MenuItem value={"shopping"}>Mercar</MenuItem>
           <MenuItem value={"int_std"}>Estándar internacional</MenuItem>
           <MenuItem value={"formula_optional"}>Fórmula a veces</MenuItem>
           <MenuItem value={"formula_mandatory"}>Fórmula</MenuItem>
-          <MenuItem value={"shopping"}>Mercar</MenuItem>
           {/* // grilla */}
           {/* sinonimos */}
           <MenuItem value={"homologacion"}>Homologacion</MenuItem>

@@ -10,9 +10,12 @@ import Button from '@mui/material/Button';
 import IconButton from '@mui/material/IconButton';
 import DeleteIcon from '@mui/icons-material/Delete';
 import convertObject from '@/utils/transformObject';
+import CloseIcon from '@mui/icons-material/Close';
+import CheckIcon from '@mui/icons-material/Check';
 
 function ShowNodeDetails({ data, incomingEdges, setIncomingEdges }) {
   const mercarRef = useRef(null);
+  const [confirmDelete, setConfirmDelete] = useState(false);
 
   if (!data || typeof data !== 'object') {
     return <p>No data available</p>;
@@ -20,22 +23,28 @@ function ShowNodeDetails({ data, incomingEdges, setIncomingEdges }) {
 
   const entries = Object.entries(data);
 
-  function handleSetNewRelations() {
+  async function handleSetNewRelations() {
     const result = incomingEdges.map(item => {
       return {
-        source: item.source.code,
+        related: item.source.code,
         ...convertObject(item.relation)
       }
     })
     const result2 = mercarRef.current.getPurchases().map(item => {
       if (item.related?.properties) {
         return {
-          source: item.related.properties.code,
+          related: item.related.properties.code,
           params: item.params,
         }
       }
     }).filter(item => item !== undefined)
-    console.log([...result, ...result2])
+    const final_data = { node: data.code, relations: [...result, ...result2] };
+    try {
+      const result = await fetchBackend("/graph/update-node-relations", "POST", final_data);
+      window.location.reload()
+    } catch (error) {
+      console.error('Error fetching root nodes:', error);
+    }
   }
 
   function handleDeleteRelation(index) {
@@ -44,9 +53,35 @@ function ShowNodeDetails({ data, incomingEdges, setIncomingEdges }) {
     setIncomingEdges(copied);
   }
 
+  async function handleDeleteNode() {
+    try {
+      const result = await fetchBackend("/graph/delete-node", "POST", { node_code: data.code });
+      window.location.reload()
+    } catch (error) {
+      console.error('Error fetching root nodes:', error);
+    }
+  }
+
   return (
     <div>
-      <h4>Detailed node</h4>
+      <div style={{ display: "flex" }}>
+        <h4>Detailed node</h4>
+        {
+          confirmDelete && <div style={{ display: "flex" }}>
+            <IconButton aria-label="delete" color="error">
+              <CloseIcon onClick={() => setConfirmDelete(false)} />
+            </IconButton>
+            <IconButton aria-label="delete" color="success">
+              <CheckIcon onClick={() => handleDeleteNode()} />
+            </IconButton>
+          </div>
+        }
+        {
+          !confirmDelete && <IconButton aria-label="delete" color="error">
+            <DeleteIcon onClick={() => setConfirmDelete(true)} />
+          </IconButton>
+        }
+      </div>
       <div style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
         {entries.map(([key, value]) => (
           <div key={key} style={{ display: 'flex', marginBottom: '8px' }}>
@@ -56,11 +91,11 @@ function ShowNodeDetails({ data, incomingEdges, setIncomingEdges }) {
         ))}
       </div><br />
       <h4>Relaciones actuales</h4>
-      <div style={{ padding: "30px", border: "1px dotted black" }}>
+      <div style={{ border: "1px dotted black" }}>
         {
           incomingEdges.map((item, index) => (
             <div>
-              <div style={{ display: "flex" }}>
+              <div style={{ display: "flex", padding: "30px" }}>
                 <div style={{ width: "100%" }}>
                   <div><b>source</b></div><br />
                   <div>{item.source.code} {item.source.name}</div>
