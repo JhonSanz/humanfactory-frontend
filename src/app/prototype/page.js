@@ -80,10 +80,6 @@ const Mercar = forwardRef(function Mercar({ }, ref) {
     }
   ]);
 
-  useEffect(() => {
-    console.log(purchase)
-  }, [purchase])
-
   useImperativeHandle(ref, () => {
     return {
       getPurchases() {

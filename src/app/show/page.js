@@ -6,43 +6,102 @@ import fetchBackend from "@/utils/commonFetch";
 import InfoOutlinedIcon from '@mui/icons-material/InfoOutlined';
 import { ThemeContext } from '@/components/providers';
 import { Mercar } from '../prototype/page';
+import Button from '@mui/material/Button';
+import IconButton from '@mui/material/IconButton';
+import DeleteIcon from '@mui/icons-material/Delete';
+import convertObject from '@/utils/transformObject';
 
-function ShowItems() {
-  const [nodes, setNodes] = useState([]);
+function ShowNodeDetails({ data, incomingEdges, setIncomingEdges }) {
+  const mercarRef = useRef(null);
 
+  if (!data || typeof data !== 'object') {
+    return <p>No data available</p>;
+  }
 
-  useEffect(() => {
-    async function init() {
-      const result = await fetchBackend("/graph/", "GET");
-      setNodes(result);
-    }
-    init();
-  }, [])
+  const entries = Object.entries(data);
+
+  function handleSetNewRelations() {
+    const result = incomingEdges.map(item => {
+      return {
+        source: item.source.code,
+        ...convertObject(item.relation)
+      }
+    })
+    const result2 = mercarRef.current.getPurchases().map(item => {
+      if (item.related?.properties) {
+        return {
+          source: item.related.properties.code,
+          params: item.params,
+        }
+      }
+    }).filter(item => item !== undefined)
+    console.log([...result, ...result2])
+  }
+
+  function handleDeleteRelation(index) {
+    const copied = [...incomingEdges];
+    copied.splice(index, 1);
+    setIncomingEdges(copied);
+  }
 
   return (
-    <Box>
-      <Box>
-        Hey :D
-      </Box>
-      <ul>
+    <div>
+      <h4>Detailed node</h4>
+      <div style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
+        {entries.map(([key, value]) => (
+          <div key={key} style={{ display: 'flex', marginBottom: '8px' }}>
+            <div style={{ flex: 1, fontWeight: 'bold' }}>{key.charAt(0).toUpperCase() + key.slice(1)}:</div>
+            <div style={{ flex: 2 }}>{value}</div>
+          </div>
+        ))}
+      </div><br />
+      <h4>Relaciones actuales</h4>
+      <div style={{ padding: "30px", border: "1px dotted black" }}>
         {
-          nodes.map(item => (
-            <li>{item.properties.name} {item.properties.code}</li>
+          incomingEdges.map((item, index) => (
+            <div>
+              <div style={{ display: "flex" }}>
+                <div style={{ width: "100%" }}>
+                  <div><b>source</b></div><br />
+                  <div>{item.source.code} {item.source.name}</div>
+                </div>
+                <div style={{ width: "100%" }}>
+                  <div><b>relation</b></div><br />
+                  {Object.entries(item.relation).map(([key, value]) => (
+                    <div key={key} style={{ display: 'flex', marginBottom: '8px' }}>
+                      <div style={{ flex: 1 }}>{key.charAt(0).toUpperCase() + key.slice(1)}:</div>
+                      <div style={{ flex: 2 }}>{value}</div>
+                    </div>
+                  ))}
+                </div>
+                <div>
+                  <IconButton aria-label="delete" color="secondary">
+                    <DeleteIcon onClick={() => handleDeleteRelation(index)} />
+                  </IconButton>
+                </div>
+              </div>
+              {index < incomingEdges.length - 1 && <hr />}
+            </div>
           ))
         }
-      </ul>
-    </Box>
-  )
+      </div><br />
+      <h4>Relaciones nuevas</h4>
+      <Mercar ref={mercarRef} />
+      <br />
+      <Button color="primary" variant="contained" onClick={() => handleSetNewRelations()}>Guardar</Button>
+    </div>
+  );
 }
+
 
 
 // Componente para renderizar un nodo del árbol
 const TreeNode = ({ node, onToggle, theIndex }) => {
   const [isExpanded, setIsExpanded] = useState(false);
   const [children, setChildren] = useState([]);
+  const [incomingEdges, setIncomingEdges] = useState([]);
   const [loading, setLoading] = useState(false);
   const { setAlertContent } = useContext(ThemeContext);
-  const mercarRef = useRef(null);
 
   useEffect(() => {
     if (isExpanded) {
@@ -69,30 +128,22 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
     onToggle(node.properties.code);
   };
 
-  function showNodeDetails(data) {
-    // Si no hay datos, mostramos un mensaje en vez de la tabla
-    if (!data || typeof data !== 'object') {
-      return <p>No data available</p>;
+  async function getNodeDetail() {
+    try {
+      const response = await fetchBackend("/graph/node-incoming-edges", "GET", {}, { node_code: node.properties.code });
+      setIncomingEdges(response);
+    } catch (error) {
+      console.error('Error fetching children:', error);
     }
-
-    // Obtener las claves del objeto para los encabezados
-    const entries = Object.entries(data);
-
-    return (
-      <div>
-        <h4>Detailed node</h4>
-        <div style={{ display: 'flex', flexDirection: 'column', width: '300px' }}>
-          {entries.map(([key, value]) => (
-            <div key={key} style={{ display: 'flex', marginBottom: '8px' }}>
-              <div style={{ flex: 1, fontWeight: 'bold' }}>{key.charAt(0).toUpperCase() + key.slice(1)}:</div>
-              <div style={{ flex: 2 }}>{value}</div>
-            </div>
-          ))}
-        </div>
-        <Mercar ref={mercarRef} />
-      </div>
-    );
   }
+
+  useEffect(() => {
+    setAlertContent(<ShowNodeDetails
+      data={node.properties}
+      incomingEdges={incomingEdges}
+      setIncomingEdges={setIncomingEdges}
+    />)
+  }, [incomingEdges])
 
   return (
     <div style={{ marginLeft: '30px', padding: "10px", width: "400px" }}>
@@ -100,7 +151,7 @@ const TreeNode = ({ node, onToggle, theIndex }) => {
         <div style={{ marginRight: "10px" }}><b>{theIndex}</b></div>
         <div><small>{node.properties.code}</small> {node.properties.name}</div>
         <div style={{ cursor: 'pointer', marginLeft: "10px", display: "flex" }}>
-          <div><InfoOutlinedIcon onClick={() => setAlertContent(showNodeDetails(node.properties))} fontSize='small' color='primary' /></div>
+          <div><InfoOutlinedIcon onClick={() => getNodeDetail()} fontSize='small' color='primary' /></div>
           <div onClick={handleToggle}>{isExpanded ? '[-]' : '[+]'}</div>
         </div>
       </div>
