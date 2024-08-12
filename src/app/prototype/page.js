@@ -19,7 +19,7 @@ function ParamsPicker({
   setParamsForm,
 }) {
   function addNewProp() {
-    setParamsForm([...paramsForm, { name: "param", value: "" }])
+    setParamsForm([...paramsForm, { name: "", value: "" }])
   }
 
   function removeNewProp() {
@@ -35,10 +35,6 @@ function ParamsPicker({
     copiedData.splice(index, 1, copiedDataItem);
     setParamsForm(copiedData);
   }
-
-  useEffect(() => {
-    console.log("paramsForm", paramsForm)
-  }, [])
 
   return (
     <Box style={{ padding: "20px", border: "1px dotted gray" }}>
@@ -279,12 +275,12 @@ export default function Prototype() {
         >
           <MenuItem value={"fundamental"}>Elemento fundamental</MenuItem>
           <MenuItem value={"shopping"}>Mercar</MenuItem>
-          <MenuItem value={"int_std"}>Estándar internacional</MenuItem>
+          {/* <MenuItem value={"int_std"}>Estándar internacional</MenuItem>
           <MenuItem value={"formula_optional"}>Fórmula a veces</MenuItem>
-          <MenuItem value={"formula_mandatory"}>Fórmula</MenuItem>
+          <MenuItem value={"formula_mandatory"}>Fórmula</MenuItem> */}
           {/* // grilla */}
           {/* sinonimos */}
-          <MenuItem value={"homologacion"}>Homologacion</MenuItem>
+          {/* <MenuItem value={"homologacion"}>Homologacion</MenuItem> */}
         </Select>
       </FormControl>
       {
